@@ -32,7 +32,7 @@ fun main() {
         //          if not found then get from api store it in cache then return the value from cache
 
         val apiFlowObj: Flow<Int?> = flow {
-            val value = api[key]
+            val value = api[key] ?: throw Exception("no value found in api for key = $key")
             println("getting value from api: $key => $value")
             emit(value)
         }.transform {
@@ -47,6 +47,7 @@ fun main() {
                 emit(null)
             }
         }
+            .catch { println("error occurred in api flow ${it.message}") }
 
         val flowObj: Flow<Int?> = flowObj1.transform {
             if (null == it) {
@@ -62,10 +63,12 @@ fun main() {
         // step 3: show the data
 
         runBlocking {
-            flowObj.collect {
-                println("----------- showing result ------------")
-                println("cache = $cache")
-                println("key=$key -> $it")
+            flowObj
+                .catch { println("error occurred while search value for $key: ${it.message}") }
+                .collect {
+                    println("----------- showing result ------------")
+                    println("cache = $cache")
+                    println("key=$key -> $it")
             }
         }
     }
