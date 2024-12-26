@@ -3,4 +3,4 @@ plugins {
 }
 rootProject.name = 'kotlin-coroutine-example'
 include ':word-finder'
-
+include ':kotlin-flow'
